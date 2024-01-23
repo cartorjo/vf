@@ -13,8 +13,8 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ${{ github.event_name == 'push' && github.event_name == 'pull_request' && 'main' == github.ref ? 'ubuntu-latest' : 'self-hosted' }}
-    timeout-minutes: ${{ github.event_name == 'push' && github.event_name == 'pull_request' && 'main' == github.ref ? 120 : 360 }}
+    runs-on: ${{ github.event_name == 'push' || github.event_name == 'pull_request' && 'main' == github.ref ? 'ubuntu-latest' : 'self-hosted' }}
+    timeout-minutes: ${{ github.event_name == 'push' || github.event_name == 'pull_request' && 'main' == github.ref ? 120 : 360 }}
     permissions:
       security-events: write
       actions: read
