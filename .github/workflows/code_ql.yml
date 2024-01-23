@@ -1,43 +1,41 @@
-name: CodeQL
+name: "CodeQL"
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
   pull_request:
-    branches:
-      - main
+    branches: ["main"]
   schedule:
-    - cron: '0 1 * * *' # Runs daily at 01:00
+    - cron: '0 1 * * *'
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: ${{ github.event_name == 'push' || github.event_name == 'pull_request' && 'main' == github.ref ? 'ubuntu-latest' : 'self-hosted' }}
-    timeout-minutes: ${{ github.event_name == 'push' || github.event_name == 'pull_request' && 'main' == github.ref ? 120 : 360 }}
+    runs-on: self-hosted
+    timeout-minutes: 360
     permissions:
       security-events: write
       actions: read
       contents: read
-    
+
     strategy:
       fail-fast: false
       matrix:
-        language: ['go', 'javascript-typescript', 'python']
+        language: [go, python, typescript]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:${{ matrix.language }}"
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
