@@ -39,5 +39,5 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{matrix.language}}"
-          env:
-            CODEQL_RAM: 8192
+        env:
+          CODEQL_RAM: 8192
