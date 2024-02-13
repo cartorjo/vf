@@ -13,26 +13,54 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Generate PlantUML file
+      - name: Generate UML file
         run: |
-          echo "@startuml" > workflow.uml
-          echo "!include <filename>" >> workflow.uml # If you have any external files included
-          echo "skinparam monochrome true" >> workflow.uml # Change the theme to monochrome
-          echo "start" >> workflow.uml
-          echo ":Checkout code;" >> workflow.uml
-          echo ":Install dependencies;" >> workflow.uml
-          # Add more steps as needed
-          echo ":Notify no build required;" >> workflow.uml
-          echo "stop" >> workflow.uml
-          echo "@enduml" >> workflow.uml
+          cat <<EOF > workflow.uml
+          @startuml
+
+          start
+
+          :Checkout code;
+          :Install dependencies;
+
+          if (Build required?) then (yes)
+            :Run unit tests;
+            if (Tests pass?) then (yes)
+              :Run linter;
+              if (Lint pass?) then (yes)
+                :Build Docker image;
+                :Push Docker image;
+                if (Deploy to Staging?) then (yes)
+                  :Deploy to Staging;
+                  if (Smoke tests pass?) then (yes)
+                    :Promote to Production;
+                    :Clean up resources;
+                  else (no)
+                    :Notify failure;
+                  endif
+                else (no)
+                  :Notify no deployment;
+                endif
+              else (no)
+                :Notify lint failure;
+              endif
+            else (no)
+              :Notify test failure;
+            endif
+          else (no)
+            :Notify no build required;
+          endif
+
+          stop
+
+          @enduml
+          EOF
 
       - name: Install PlantUML
         run: sudo apt-get install -y plantuml
 
       - name: Generate UML image
         run: plantuml workflow.uml
-        # Optionally, you can add the following line to save the generated image to a specific file name
-        # run: plantuml -tpng workflow.uml -o output.png
 
       - name: Commit and push UML file
         if: always()
