@@ -14,9 +14,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate PlantUML file
-        id: generate-plantuml
         run: |
           echo "@startuml" > workflow.uml
+          echo "!include <filename>" >> workflow.uml # If you have any external files included
+          echo "skinparam monochrome true" >> workflow.uml # Change the theme to monochrome
           echo "start" >> workflow.uml
           echo ":Checkout code;" >> workflow.uml
           echo ":Install dependencies;" >> workflow.uml
@@ -30,9 +31,11 @@ jobs:
 
       - name: Generate UML image
         run: plantuml workflow.uml
+        # Optionally, you can add the following line to save the generated image to a specific file name
+        # run: plantuml -tpng workflow.uml -o output.png
 
       - name: Commit and push UML file
-        if: success()
+        if: always()
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Update UML diagram"
