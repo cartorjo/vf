@@ -17,9 +17,10 @@ jobs:
         run: |
           cat <<EOF > workflow.uml
           @startuml
+          !define AmigaTheme
+          !includeurl https://raw.githubusercontent.com/RobinWils/plantuml-themes/master/amiga.puml
 
           start
-
           :Checkout code;
           :Install dependencies;
 
@@ -52,7 +53,6 @@ jobs:
           endif
 
           stop
-
           @enduml
           EOF
 
