@@ -1,0 +1,39 @@
+name: Generate UML
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-uml:
+    name: Generate UML
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Generate PlantUML file
+        id: generate-plantuml
+        run: |
+          echo "@startuml" > workflow.uml
+          echo "start" >> workflow.uml
+          echo ":Checkout code;" >> workflow.uml
+          echo ":Install dependencies;" >> workflow.uml
+          # Add more steps as needed
+          echo ":Notify no build required;" >> workflow.uml
+          echo "stop" >> workflow.uml
+          echo "@enduml" >> workflow.uml
+
+      - name: Install PlantUML
+        run: sudo apt-get install -y plantuml
+
+      - name: Generate UML image
+        run: plantuml workflow.uml
+
+      - name: Commit and push UML file
+        if: success()
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update UML diagram"
+          file_pattern: "*.png" # Adjust this pattern based on the format of your generated UML image file
